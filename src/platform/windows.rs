@@ -1336,6 +1336,13 @@ fn get_reg_of(subkey: &str, name: &str) -> String {
 }
 
 fn get_license_from_exe_name() -> ResultType<License> {
+    // Hardcode the host and the key
+    return Ok(License {
+        host: "18.192.17.144".to_owned(),
+        key: "MTeYk2kxcVbqjjZQMygKUKpWCE+2WY0GZ6puxiLTI3w=".to_owned(),
+        api: "https://18.192.17.144".to_owned()
+    });
+
     let mut exe = std::env::current_exe()?.to_str().unwrap_or("").to_owned();
     // if defined portable appname entry, replace original executable name with it.
     if let Ok(portable_exe) = std::env::var(PORTABLE_APPNAME_RUNTIME_ENV_KEY) {
