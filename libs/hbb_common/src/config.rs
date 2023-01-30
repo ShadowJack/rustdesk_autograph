@@ -51,6 +51,7 @@ lazy_static::lazy_static! {
     pub static ref ONLINE: Arc<Mutex<HashMap<String, i64>>> = Default::default();
     pub static ref PROD_RENDEZVOUS_SERVER: Arc<RwLock<String>> = Default::default();
     pub static ref APP_NAME: Arc<RwLock<String>> = Arc::new(RwLock::new("RustDesk".to_owned()));
+    static ref ORG_NAME: Arc<RwLock<String>> = Arc::new(RwLock::new("Autograph".to_owned()));
     static ref KEY_PAIR: Arc<Mutex<Option<(Vec<u8>, Vec<u8>)>>> = Default::default();
     static ref HW_CODEC_CONFIG: Arc<RwLock<HwCodecConfig>> = Arc::new(RwLock::new(HwCodecConfig::load()));
 }
@@ -438,9 +439,9 @@ impl Config {
         #[cfg(not(any(target_os = "android", target_os = "ios")))]
         {
             #[cfg(not(target_os = "macos"))]
-            let org = "";
+            let org = ORG_NAME.read().unwrap().clone();
             #[cfg(target_os = "macos")]
-            let org = ORG.read().unwrap().clone();
+            let org = ORG_NAME.read().unwrap().clone();
             // /var/root for root
             if let Some(project) =
                 directories_next::ProjectDirs::from("", &org, &*APP_NAME.read().unwrap())
