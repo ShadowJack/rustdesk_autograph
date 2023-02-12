@@ -104,6 +104,13 @@ jobs:
         mkdir -p ./SignOutput
         mv ./target/release/rustdesk-portable-packer.exe ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
 
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@master
+      with:
+        name: rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+        path: |
+          ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+
     # - name: Rename rustdesk
     #   shell: bash
     #   run: |
