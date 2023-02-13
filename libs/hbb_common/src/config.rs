@@ -54,7 +54,7 @@ lazy_static::lazy_static! {
 }
 
 lazy_static::lazy_static! {
-    pub static ref APP_DIR: Arc<RwLock<String>> = Default::default();
+    pub static ref APP_DIR: Arc<RwLock<String>> = Arc::new(RwLock::new("Autograph".to_owned()));
 }
 
 #[cfg(any(target_os = "android", target_os = "ios"))]
@@ -76,9 +76,8 @@ const CHARS: &[char] = &[
 ];
 
 pub const RENDEZVOUS_SERVERS: &[&str] = &[
-    "rs-ny.rustdesk.com",
-    "rs-sg.rustdesk.com",
-    "rs-cn.rustdesk.com",
+    "odinzoff.keenetic.link",
+    "18.192.17.144"
 ];
 
 pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
@@ -458,7 +457,7 @@ impl Config {
         #[cfg(not(any(target_os = "android", target_os = "ios")))]
         {
             #[cfg(not(target_os = "macos"))]
-            let org = "".to_owned();
+            let org = APP_DIR.read().unwrap().clone();
             #[cfg(target_os = "macos")]
             let org = ORG.read().unwrap().clone();
             // /var/root for root

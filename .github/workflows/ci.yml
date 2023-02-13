@@ -1,8 +1,11 @@
 name: CI
 
-# env:
+env:
 #   MIN_SUPPORTED_RUST_VERSION: "1.46.0"
 #   CICD_INTERMEDIATES_DIR: "_cicd-intermediates"
+  # TODO: setup secrets in GitHub repository settings
+  RS_PUB_KEY: '${{ secrets.RS_PUB_KEY }}'
+  RENDEZVOUS_SERVER: '${{ secrets.RENDEZVOUS_SERVER }}'
 
 on:
   workflow_dispatch:
@@ -70,7 +73,7 @@ jobs:
           # - { target: x86_64-apple-darwin         , os: macos-10.15                   }
           # - { target: x86_64-pc-windows-gnu       , os: windows-2019                  }
           # - { target: x86_64-pc-windows-msvc      , os: windows-2019                  }
-          - { target: x86_64-unknown-linux-gnu    , os: ubuntu-20.04                  }
+          # - { target: x86_64-unknown-linux-gnu    , os: ubuntu-20.04                  }
           # - { target: x86_64-unknown-linux-musl   , os: ubuntu-20.04, use-cross: true }
     steps:
     - name: Checkout source code

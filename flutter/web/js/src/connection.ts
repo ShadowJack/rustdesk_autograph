@@ -8,9 +8,8 @@ import { decompress, mapKey, sleep } from "./common";
 
 const PORT = 21116;
 const HOSTS = [
-  "rs-sg.rustdesk.com",
-  "rs-cn.rustdesk.com",
-  "rs-us.rustdesk.com",
+  "odinzoff.keenetic.link",
+  "18.192.17.144"
 ];
 let HOST = localStorage.getItem("rendezvous-server") || HOSTS[0];
 const SCHEMA = "ws://";
