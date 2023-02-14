@@ -98,6 +98,16 @@ jobs:
     - name: Build rustdesk
       run: python3 .\build.py --portable --hwcodec --flutter
 
+    - name: Sign rustdesk files
+      uses: GermanBluefox/code-sign-action@v7
+      with:
+        certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
+        password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
+        certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
+        # certificatename: '${{ secrets.CERTNAME }}'
+        folder: '../../flutter/build/windows/runner/Release/'
+        recursive: true
+
     - name: Build self-extracted executable
       shell: bash
       run: |
@@ -106,6 +116,15 @@ jobs:
         popd
         mkdir -p ./SignOutput
         mv ./target/release/rustdesk-portable-packer.exe ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+
+    - name: Sign rustdesk self-extracted file
+      uses: GermanBluefox/code-sign-action@v7
+      with:
+        certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
+        password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
+        certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
+        folder: './SignOutput'
+        recursive: false
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@master
