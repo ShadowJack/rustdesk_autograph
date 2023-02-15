@@ -1,5 +1,16 @@
 name: Full Flutter CI
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - autograph
+    tags:
+      - '*'
+    paths-ignore:
+      - ".github/**"
+
 env:
   LLVM_VERSION: "15.0.6"
   FLUTTER_VERSION: "3.7.0"
