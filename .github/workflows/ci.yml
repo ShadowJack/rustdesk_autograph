@@ -5,7 +5,7 @@ env:
   TAG_NAME: "latest"
   # vcpkg version: 2022.05.10
   # for multiarch gcc compatibility
-  VCPKG_COMMIT_ID: '1d4128f08e30cec31b94500840c7eca8ebc579cb'
+  VCPKG_COMMIT_ID: "14e7bb4ae24616ec54ff6b2f6ef4e8659434ea44"
   VERSION: "1.1.9"
   RS_PUB_KEY: '${{ secrets.RS_PUB_KEY }}'
   RENDEZVOUS_SERVER: '${{ secrets.RENDEZVOUS_SERVER }}'
