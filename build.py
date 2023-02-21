@@ -71,6 +71,7 @@ def parse_rc_features(feature):
 
 def make_parser():
     parser = argparse.ArgumentParser(description='Build script.')
+    parser.add_argument('--target')
     parser.add_argument(
         '-f',
         '--feature',
@@ -393,6 +394,7 @@ def main():
     if args.skip_cargo:
         skip_cargo = True
     portable = args.portable
+    target = args.target
     if windows:
         # build virtual display dynamic library
         os.chdir('libs/virtual_display/dylib')
@@ -402,7 +404,7 @@ def main():
         if flutter:
             build_flutter_windows(version, features)
             return
-        os.system('cargo build --release --features ' + features)
+        os.system('cargo build --release ' + ' --target=' + target  + ' --features ' + features)
         # os.system('upx.exe target/release/rustdesk.exe')
         os.system('mv target/release/rustdesk.exe target/release/RustDesk.exe')
         pa = os.environ.get('P')
