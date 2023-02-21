@@ -5,6 +5,8 @@ import platform
 import zlib
 from shutil import copy2
 import hashlib
+import sys
+import getopt
 
 windows = platform.platform().startswith('Windows')
 osx = platform.platform().startswith('Darwin') or platform.platform().startswith("macOS")
@@ -19,6 +21,14 @@ def get_version():
                 return line.replace("version", "").replace("=", "").replace('"', '').strip()
     return ''
 
+def get_target():
+    argv = sys.argv[1:]
+    opts, _ = getopt.getopt(argv,"t:",["target="])
+    if opts == []:
+        return 'x86_64-pc-windows-msvc'
+    else:
+        (_, val) = opts[0]
+        return val
 
 def main():
     os.system("cp Cargo.toml Cargo.toml.bk")
@@ -34,8 +44,10 @@ def main():
     if os.path.isfile('/usr/bin/pacman'):
         os.system('git checkout src/ui/common.tis')
     version = get_version()
+    target = get_target()
+    print("target %s"%target)
     if windows:
-        os.system('cargo build --release --features inline')
+        os.system('cargo build --release --target %s --features inline'%target)
         # os.system('upx.exe target/release/rustdesk.exe')
         os.system('mv target/release/rustdesk.exe target/release/RustDesk.exe')
         pa = os.environ.get('P')
