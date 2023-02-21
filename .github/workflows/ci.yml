@@ -13,17 +13,10 @@ env:
 
 on:
   workflow_dispatch:
-    branches:
-      - master
-      - autograph
-    tags:
-      - '*'
-    paths-ignore:
-      - ".github/**"
 
 jobs:
 
-  build-for-windows:
+  build:
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
     runs-on: ${{ matrix.job.os }}
     strategy:
@@ -33,71 +26,71 @@ jobs:
           - { target: i686-pc-windows-msvc, os: windows-2019 }
           - { target: x86_64-pc-windows-msvc, os: windows-2019 }
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
+    - name: Checkout source code
+      uses: actions/checkout@v3
 
-      - name: Install LLVM and Clang
-        uses: KyleMayes/install-llvm-action@v1
-        with:
-          version: ${{ env.LLVM_VERSION }}
+    - name: Install LLVM and Clang
+      uses: KyleMayes/install-llvm-action@v1
+      with:
+        version: ${{ env.LLVM_VERSION }}
 
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: ${{ matrix.job.target }}
-          override: true
-          profile: minimal # minimal component installation (ie, no documentation)
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: ${{ matrix.job.target }}
+        override: true
+        profile: minimal # minimal component installation (ie, no documentation)
 
-      - uses: Swatinem/rust-cache@v2
-        with:
-          prefix-key: ${{ matrix.job.os }}
+    - uses: Swatinem/rust-cache@v2
+      with:
+        prefix-key: ${{ matrix.job.os }}
 
 
-      - name: Install vcpkg dependencies
-        run: |
-          case ${{ matrix.job.target }} in
-            i686-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx libyuv opus ;;
-            x86_64-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx:x64-windows-static libyuv:x64-windows-static opus:x64-windows-static ;;
-          esac
-        shell: bash
+    - name: Install vcpkg dependencies
+      run: |
+        case ${{ matrix.job.target }} in
+          i686-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx libyuv opus ;;
+          x86_64-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx:x64-windows-static libyuv:x64-windows-static opus:x64-windows-static ;;
+        esac
+      shell: bash
 
-      - name: Build rustdesk
-        run: python3 .\build.py --portable --hwcodec
+    - name: Build rustdesk
+      run: python3 .\build.py --portable --hwcodec
 
-      - name: Build self-extracted executable
-        shell: bash
-        run: |
-          pushd ./libs/portable
-          python3 ./generate.py -f ../../target/release/ -o . -e ../../target/release/rustdesk.exe
-          popd
-          mkdir -p ./SignOutput
-          mv ./target/release/rustdesk-portable-packer.exe ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+    - name: Build self-extracted executable
+      shell: bash
+      run: |
+        pushd ./libs/portable
+        python3 ./generate.py -f ../../target/release/ -o . -e ../../target/release/rustdesk.exe
+        popd
+        mkdir -p ./SignOutput
+        mv ./target/release/rustdesk-portable-packer.exe ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
 
-      - name: Sign rustdesk self-extracted file
-        uses: GermanBluefox/code-sign-action@v7
-        with:
-          certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
-          password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
-          certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
-          # certificatename: '${{ secrets.WINDOWS_PFX_NAME }}'
-          folder: './SignOutput'
-          recursive: false
+    - name: Sign rustdesk self-extracted file
+      uses: GermanBluefox/code-sign-action@v7
+      with:
+        certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
+        password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
+        certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
+        # certificatename: '${{ secrets.WINDOWS_PFX_NAME }}'
+        folder: './SignOutput'
+        recursive: false
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@master
-        with:
-          name: rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
-          path: |
-            ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@master
+      with:
+        name: rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+        path: |
+          ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
 
-      - name: Publish Release
-        uses: softprops/action-gh-release@v1
-        with:
-          prerelease: true
-          tag_name: ${{ env.TAG_NAME }}
-          files: |
-            ./SignOutput/rustdesk-*.exe
+    - name: Publish Release
+      uses: softprops/action-gh-release@v1
+      with:
+        prerelease: true
+        tag_name: ${{ env.TAG_NAME }}
+        files: |
+          ./SignOutput/rustdesk-*.exe
 
     # - name: Strip debug information from executable
     #   id: strip
