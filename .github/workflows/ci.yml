@@ -1,130 +1,103 @@
-name: CI
+name: Release with Sciter
 
 env:
-#   MIN_SUPPORTED_RUST_VERSION: "1.46.0"
-#   CICD_INTERMEDIATES_DIR: "_cicd-intermediates"
-  # TODO: setup secrets in GitHub repository settings
+  LLVM_VERSION: "15.0.6"
+  TAG_NAME: "latest"
+  # vcpkg version: 2022.05.10
+  # for multiarch gcc compatibility
+  VCPKG_COMMIT_ID: "14e7bb4ae24616ec54ff6b2f6ef4e8659434ea44"
+  VERSION: "1.2.0"
+  # To make a custom build with your own servers set the below secret values
   RS_PUB_KEY: '${{ secrets.RS_PUB_KEY }}'
   RENDEZVOUS_SERVER: '${{ secrets.RENDEZVOUS_SERVER }}'
 
 on:
   workflow_dispatch:
-  pull_request:
-  push:
     branches:
       - master
+      - autograph
     tags:
       - '*'
     paths-ignore:
       - ".github/**"
 
 jobs:
-  # ensure_cargo_fmt:
-  #   name: Ensure 'cargo fmt' has been run
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #   - uses: actions-rs/toolchain@v1
-  #     with:
-  #       toolchain: stable
-  #       default: true
-  #       profile: minimal
-  #       components: rustfmt
-  #   - uses: actions/checkout@v3
-  #   - run: cargo fmt -- --check
 
-  # min_version:
-  #   name: Minimum supported rust version
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #   - name: Checkout source code
-  #     uses: actions/checkout@v3
-
-  #   - name: Install rust toolchain (v${{ env.MIN_SUPPORTED_RUST_VERSION }})
-  #     uses: actions-rs/toolchain@v1
-  #     with:
-  #       toolchain: ${{ env.MIN_SUPPORTED_RUST_VERSION }}
-  #       default: true
-  #       profile: minimal # minimal component installation (ie, no documentation)
-  #       components: clippy
-  #   - name: Run clippy (on minimum supported rust version to prevent warnings we can't fix)
-  #     uses: actions-rs/cargo@v1
-  #     with:
-  #       command: clippy
-  #       args: --locked --all-targets --all-features -- --allow clippy::unknown_clippy_lints
-  #   - name: Run tests
-  #     uses: actions-rs/cargo@v1
-  #     with:
-  #       command: test
-  #       args: --locked
-
-  build:
+  build-for-windows:
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
     runs-on: ${{ matrix.job.os }}
     strategy:
       fail-fast: false
       matrix:
         job:
-          # - { target: aarch64-unknown-linux-gnu   , os: ubuntu-20.04, use-cross: true }
-          # - { target: arm-unknown-linux-gnueabihf , os: ubuntu-20.04, use-cross: true }
-          # - { target: arm-unknown-linux-musleabihf, os: ubuntu-20.04, use-cross: true }
-          # - { target: i686-pc-windows-msvc        , os: windows-2019                  }
-          # - { target: i686-unknown-linux-gnu      , os: ubuntu-20.04, use-cross: true }
-          # - { target: i686-unknown-linux-musl     , os: ubuntu-20.04, use-cross: true }
-          # - { target: x86_64-apple-darwin         , os: macos-10.15                   }
-          # - { target: x86_64-pc-windows-gnu       , os: windows-2019                  }
-          # - { target: x86_64-pc-windows-msvc      , os: windows-2019                  }
-          # - { target: x86_64-unknown-linux-gnu    , os: ubuntu-20.04                  }
-          # - { target: x86_64-unknown-linux-musl   , os: ubuntu-20.04, use-cross: true }
+          - { target: i686-pc-windows-msvc, os: windows-2019 }
+          - { target: x86_64-pc-windows-msvc, os: windows-2019 }
     steps:
-    - name: Checkout source code
-      uses: actions/checkout@v3
+      - name: Checkout source code
+        uses: actions/checkout@v3
 
-    - name: Install prerequisites
-      shell: bash
-      run: |
-        case ${{ matrix.job.target }} in
-          x86_64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt install -y g++ gcc git curl wget nasm yasm libgtk-3-dev clang libxcb-randr0-dev libxdo-dev libxfixes-dev libxcb-shape0-dev libxcb-xfixes0-dev libasound2-dev libpulse-dev cmake libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev;;
-          # arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
-          # aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
-        esac
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: ${{ env.LLVM_VERSION }}
 
-    - name: Restore from cache and install vcpkg
-      uses: lukka/run-vcpkg@v7
-      with:
-        setupOnly: true
-        vcpkgGitCommitId: '1d4128f08e30cec31b94500840c7eca8ebc579cb'
-    
-    - name: Install vcpkg dependencies
-      run: |
-        $VCPKG_ROOT/vcpkg install libvpx libyuv opus
-      shell: bash        
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+          profile: minimal # minimal component installation (ie, no documentation)
 
-    - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        target: ${{ matrix.job.target }}
-        override: true
-        profile: minimal # minimal component installation (ie, no documentation)
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ matrix.job.os }}
 
-    - name: Show version information (Rust, cargo, GCC)
-      shell: bash
-      run: |
-        gcc --version || true
-        rustup -V
-        rustup toolchain list
-        rustup default
-        cargo -V
-        rustc -V
 
-    - uses: Swatinem/rust-cache@v1
-  
-    - name: Build
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: ${{ matrix.job.use-cross }}
-        command: build
-        args: --locked --release --target=${{ matrix.job.target }}
+      - name: Install vcpkg dependencies
+        run: |
+          case ${{ matrix.job.target }} in
+            i686-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx libyuv opus ;;
+            x86_64-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx:x64-windows-static libyuv:x64-windows-static opus:x64-windows-static ;;
+          esac
+        shell: bash
+
+      - name: Build rustdesk
+        run: python3 .\build.py --portable --hwcodec
+
+      - name: Build self-extracted executable
+        shell: bash
+        run: |
+          pushd ./libs/portable
+          python3 ./generate.py -f ../../target/release/ -o . -e ../../target/release/rustdesk.exe
+          popd
+          mkdir -p ./SignOutput
+          mv ./target/release/rustdesk-portable-packer.exe ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+
+      - name: Sign rustdesk self-extracted file
+        uses: GermanBluefox/code-sign-action@v7
+        with:
+          certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
+          password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
+          certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
+          # certificatename: '${{ secrets.WINDOWS_PFX_NAME }}'
+          folder: './SignOutput'
+          recursive: false
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+          path: |
+            ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          tag_name: ${{ env.TAG_NAME }}
+          files: |
+            ./SignOutput/rustdesk-*.exe
 
     # - name: Strip debug information from executable
     #   id: strip
