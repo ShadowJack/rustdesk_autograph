@@ -2,6 +2,7 @@
 
 import re
 
+print("Inlining sciter")
 
 def strip(s): return re.sub(r'\s+\n', '\n', re.sub(r'\n\s+', '\n', s))
 

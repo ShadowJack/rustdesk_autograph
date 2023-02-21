@@ -63,6 +63,11 @@ jobs:
     - name: Build rustdesk
       run: python3 .\build.py --portable --hwcodec --target=${{ matrix.job.target }}
 
+    - name: Install depenencies for packaging
+      uses: BSFishy/pip-action@v1
+      with:
+        packages: Brotli
+
     - name: Build self-extracted executable
       shell: bash
       run: |
