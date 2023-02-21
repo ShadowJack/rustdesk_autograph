@@ -46,6 +46,11 @@ jobs:
       with:
         prefix-key: ${{ matrix.job.os }}
 
+    - name: Restore from cache and install vcpkg
+      uses: lukka/run-vcpkg@v7
+      with:
+        setupOnly: true
+        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
 
     - name: Install vcpkg dependencies
       run: |
