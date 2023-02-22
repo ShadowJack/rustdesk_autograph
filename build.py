@@ -404,9 +404,15 @@ def main():
         if flutter:
             build_flutter_windows(version, features)
             return
-        os.system('cargo build --release ' + ' --target=' + target  + ' --features ' + features)
+        build_cmd = 'cargo build --release ' + ' --target=' + target  + ' --features ' + features
+        print(build_cmd)
+        os.system(build_cmd)
         # os.system('upx.exe target/release/rustdesk.exe')
+        print('target/release:')
         os.system('ls -al target/release')
+        print('target/release/build:')
+        os.system('ls -al target/release/build')
+
         os.system('mv target/release/rustdesk.exe target/release/RustDesk.exe')
         pa = os.environ.get('P')
         if pa:
