@@ -406,6 +406,7 @@ def main():
             return
         os.system('cargo build --release ' + ' --target=' + target  + ' --features ' + features)
         # os.system('upx.exe target/release/rustdesk.exe')
+        os.system('ls -al target/release')
         os.system('mv target/release/rustdesk.exe target/release/RustDesk.exe')
         pa = os.environ.get('P')
         if pa:
