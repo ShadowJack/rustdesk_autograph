@@ -72,10 +72,10 @@ jobs:
       shell: bash
       run: |
         pushd ./libs/portable
-        python3 ./generate.py -f ../../target/release/ -o . -e ../../target/release/rustdesk.exe
+        python3 ./generate.py -f ../../target/${{ matrix.job.target }}/release/ -o . -e ../../target/${{ matrix.job.target }}/release/rustdesk.exe
         popd
         mkdir -p ./SignOutput
-        mv ./target/release/rustdesk-portable-packer.exe ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+        mv ./target/${{ matrix.job.target }}/release/rustdesk-portable-packer.exe ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
 
     - name: Sign rustdesk self-extracted file
       uses: GermanBluefox/code-sign-action@v7

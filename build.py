@@ -398,28 +398,21 @@ def main():
     if windows:
         # build virtual display dynamic library
         os.chdir('libs/virtual_display/dylib')
-        os.system('cargo build --release --target=%s'%target)
+        os.system(f'cargo build --release --target={target}')
         os.chdir('../../..')
 
         if flutter:
             build_flutter_windows(version, features)
             return
-        build_cmd = 'cargo build --release ' + ' --target=' + target  + ' --features ' + features
-        print(build_cmd)
+        build_cmd = f'cargo build --release --target={target} --features {features}'
         os.system(build_cmd)
-        # os.system('upx.exe target/release/rustdesk.exe')
-        os.system('echo "Looking for the built executable:"')
-        os.system('find . -name "rustdesk*.exe" -print')
-        os.system('mv target/release/rustdesk.exe target/release/RustDesk.exe')
         pa = os.environ.get('P')
         if pa:
             os.system(
                 f'signtool sign /a /v /p {pa} /debug /f .\\cert.pfx /t http://timestamp.digicert.com  '
-                'target\\release\\rustdesk.exe')
+                f'target\\{target}\\release\\rustdesk.exe')
         else:
             print('Not signed')
-        os.system(
-            f'cp -rf target/release/RustDesk.exe rustdesk-{version}-win7-install.exe')
     elif os.path.isfile('/usr/bin/pacman'):
         # pacman -S -needed base-devel
         os.system("sed -i 's/pkgver=.*/pkgver=%s/g' res/PKGBUILD" % version)
