@@ -408,11 +408,8 @@ def main():
         print(build_cmd)
         os.system(build_cmd)
         # os.system('upx.exe target/release/rustdesk.exe')
-        print('target/release:')
-        os.system('ls -al target/release')
-        print('target/release/build:')
-        os.system('ls -al target/release/build')
-
+        os.system('echo "Looking for the built executable:"')
+        os.system('find . -name "rustdesk*.exe" -print')
         os.system('mv target/release/rustdesk.exe target/release/RustDesk.exe')
         pa = os.environ.get('P')
         if pa:
