@@ -58,7 +58,7 @@ jobs:
     - name: Install vcpkg dependencies
       run: |
         case ${{ matrix.job.target }} in
-          i686-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx:x86-windows-static libyuv:x86-windows-static opus:x86-windows-static ;;
+        i686-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx:x86-windows-static libyuv:x86-windows-static opus:x86-windows-static libsodium:x86-windows-static;;
           x86_64-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx:x64-windows-static libyuv:x64-windows-static opus:x64-windows-static ;;
         esac
       shell: bash
