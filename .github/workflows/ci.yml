@@ -69,9 +69,9 @@ jobs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@master
       with:
-        name: rustdesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
+        name: RustDesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
         path: |
-          ./target/${{ matrix.job.target }}/release/rustdesk-${{ env.VERSION }}.exe
+          ./target/${{ matrix.job.target }}/release/RustDesk-${{ env.VERSION }}-${{ matrix.job.target }}.exe
 
     - name: Publish Release
       uses: softprops/action-gh-release@v1
@@ -79,4 +79,4 @@ jobs:
         prerelease: true
         tag_name: ${{ env.TAG_NAME }}
         files: |
-          ./target/${{ matrix.job.target }}/release/rustdesk-*.exe
+          ./target/${{ matrix.job.target }}/release/RustDesk-*.exe
