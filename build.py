@@ -45,17 +45,16 @@ def main():
         os.system('git checkout src/ui/common.tis')
     version = get_version()
     target = get_target()
-    print("target %s"%target)
+    print(f"target {target}")
     if windows:
-        os.system('cargo build --release --target %s --features inline'%target)
+        os.system(f'cargo build --release --target {target} --features inline')
         # os.system('upx.exe target/release/rustdesk.exe')
-        os.system('mv target/release/rustdesk.exe target/release/RustDesk.exe')
+        os.system(f'mv target/{target}/release/rustdesk.exe target/{target}/release/RustDesk-{version}-{target}.exe')
         pa = os.environ.get('P')
         if pa:
           os.system('signtool sign /a /v /p %s /debug /f .\\cert.pfx /t http://timestamp.digicert.com  target\\release\\rustdesk.exe'%pa)
         else:
           print('Not signed')
-        os.system('cp -rf target/release/RustDesk.exe rustdesk-%s-putes.exe'%version)
     else:
         os.system('cargo bundle --release --features inline')
         if osx:
