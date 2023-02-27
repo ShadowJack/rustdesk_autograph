@@ -26,8 +26,8 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { target: i686-pc-windows-msvc, os: windows-2019 }
-          - { target: x86_64-pc-windows-msvc, os: windows-2019 }
+          - { target: i686-pc-windows-msvc, os: windows-2019, toolchain: stable-i686 }
+          - { target: x86_64-pc-windows-msvc, os: windows-2019, toolchain: stable }
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: stable
+        toolchain: ${{ matrix.job.toolchain }}
         target: ${{ matrix.job.target }}
         override: true
         profile: minimal # minimal component installation (ie, no documentation)
@@ -58,7 +58,7 @@ jobs:
     - name: Install vcpkg dependencies
       run: |
         case ${{ matrix.job.target }} in
-        i686-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx:x86-windows-static libyuv:x86-windows-static opus:x86-windows-static libsodium:x86-windows-static;;
+          i686-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx:x86-windows-static libyuv:x86-windows-static opus:x86-windows-static ;;
           x86_64-pc-windows-msvc) $VCPKG_ROOT/vcpkg install libvpx:x64-windows-static libyuv:x64-windows-static opus:x64-windows-static ;;
         esac
       shell: bash
