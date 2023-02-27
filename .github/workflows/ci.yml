@@ -26,21 +26,26 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { target: i686-pc-windows-msvc, os: windows-2019, toolchain: stable-i686 }
-          - { target: x86_64-pc-windows-msvc, os: windows-2019, toolchain: stable }
+          - { target: i686-pc-windows-msvc, os: windows-2019, rustup_toolchain: stable-i686, llvm_platform: x86 }
+          - { target: x86_64-pc-windows-msvc, os: windows-2019, rustup_toolchain: stable, llvm_platform: x64 }
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
 
+    # - name: Install LLVM and Clang
+    #   uses: KyleMayes/install-llvm-action@v1
+    #   with:
+    #     version: ${{ env.LLVM_VERSION }}
     - name: Install LLVM and Clang
-      uses: KyleMayes/install-llvm-action@v1
+      uses: egor-tensin/setup-clang@v1
       with:
         version: ${{ env.LLVM_VERSION }}
+        platform: ${{ matrix.job.llvm_platform }}
 
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: ${{ matrix.job.toolchain }}
+        toolchain: ${{ matrix.job.rustup_toolchain }}
         target: ${{ matrix.job.target }}
         override: true
         profile: minimal # minimal component installation (ie, no documentation)
