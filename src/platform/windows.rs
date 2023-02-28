@@ -2,7 +2,7 @@ use super::{CursorData, ResultType};
 use crate::ipc;
 use hbb_common::{
     allow_err, bail,
-    config::{Config, APP_NAME},
+    config::{Config, APP_NAME, ORG_NAME},
     log, sleep, timeout, tokio,
 };
 use std::io::prelude::*;
@@ -745,7 +745,7 @@ pub fn get_install_info() -> (String, String, String, String) {
             pf = tmp.to_string();
         }
     }
-    let path = format!("{}\\{}", pf, APP_NAME);
+    let path = format!("{}\\{}\\{}", pf, ORG_NAME, APP_NAME);
     let start_menu = format!(
         "%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs\\{}",
         APP_NAME
