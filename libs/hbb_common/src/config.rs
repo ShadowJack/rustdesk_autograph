@@ -290,7 +290,7 @@ impl Config {
             return path;
         }
         #[cfg(not(target_os = "macos"))]
-        let org = "";
+        let org = ORG_NAME;
         #[cfg(target_os = "macos")]
         let org = ORG;
         // /var/root for root
