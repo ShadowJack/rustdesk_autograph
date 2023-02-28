@@ -13,6 +13,7 @@ use std::{
 };
 
 pub const APP_NAME: &str = "RustDesk";
+pub const ORG_NAME: &str = "Autograph";
 pub const RENDEZVOUS_TIMEOUT: u64 = 12_000;
 pub const CONNECT_TIMEOUT: u64 = 18_000;
 pub const REG_INTERVAL: i64 = 12_000;
@@ -46,9 +47,7 @@ const CHARS: &'static [char] = &[
 ];
 
 pub const RENDEZVOUS_SERVERS: &'static [&'static str] = &[
-    "rs-ny.rustdesk.com",
-    "rs-sg.rustdesk.com",
-    "rs-cn.rustdesk.com",
+    "remote.autograph.com.ru"
 ];
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -267,7 +266,7 @@ impl Config {
     }
 
     fn file_(suffix: &str) -> PathBuf {
-        let name = format!("{}{}", APP_NAME, suffix);
+        let name = format!("{}{}{}", ORG_NAME, APP_NAME, suffix);
         Self::path(name).with_extension("toml")
     }
 
