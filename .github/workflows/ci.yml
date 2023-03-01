@@ -45,10 +45,9 @@ jobs:
           url = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/LLVM-{version}-win{platform}.exe"
           print(f"Fetching LLVM from url: {url}")
           (archive_path, headers) = urllib.request.urlretrieve(url)
-          archive_name = ntpath.basename(archive_path)
+          print(f"File is downloaded: {os.path.exists(archive_path)}")
           dst_path = "C:/Program Files/LLVM"
-          print(f"File {archive_name} is downloaded: {os.path.exists(archive_path)}")
-          os.system(f"7z x -y -o{dst_path} {archive_name}")
+          os.system(f'7z x "{archive_path}" -y -o"{dst_path}"')
           add_path(f"{dst_path}/bin")
           set_env("LLVM_PATH", f"{dst_path}/bin")
           set_env("LIBCLANG_PATH", f"{dst_path}/bin")
