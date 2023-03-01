@@ -26,11 +26,24 @@ jobs:
       fail-fast: true
       matrix:
         job:
-          - { target: i686-pc-windows-msvc, os: windows-2019, rustup_toolchain: stable-i686, llvm_platform: x86 }
-          - { target: x86_64-pc-windows-msvc, os: windows-2019, rustup_toolchain: stable, llvm_platform: x64 }
+          - { target: i686-pc-windows-msvc, os: windows-2019, rustup_toolchain: stable-i686, llvm_platform: 32 }
+          - { target: x86_64-pc-windows-msvc, os: windows-2019, rustup_toolchain: stable, llvm_platform: 64 }
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
+
+    - name: Install LLVM and Clang
+      uses: jannekem/run-python-script-action@v1
+      with:
+        script: |
+          import os
+          import urllib.request
+          version = '${{ env.LLVM_VERSION }}'
+          platform = '${{ matrix.job.llvm_platform }}'
+          url = f'https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/LLVM-{version}-win{platform}.exe'
+          (archive_name, _) = urllib.request.urlretrieve(url, 'llvm_archive.7z')
+          dst_path = 'C:/Program Files/LLVM'
+          os.system(f'7z x -y -o{dst_path} {archive_name}')
 
     # - name: Install LLVM and Clang
     #   uses: KyleMayes/install-llvm-action@v1
