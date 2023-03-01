@@ -43,8 +43,9 @@ jobs:
           print(f"version: {version}, platform: {platform}")
           url = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/LLVM-{version}-win{platform}.exe"
           print(f"Fetching LLVM from url: {url}")
-          (archive_name, _) = urllib.request.urlretrieve(url, "llvm_archive.7z")
+          (archive_name, headers) = urllib.request.urlretrieve(url)
           dst_path = "C:/Program Files/LLVM"
+          print(f"File {archive_name} is downloaded: {os.path.exists(archive_name)}")
           os.system(f"7z x -y -o{dst_path} {archive_name}")
           add_path(f"{dst_path}/bin")
           set_env("LLVM_PATH", f"{dst_path}/bin")
