@@ -38,14 +38,16 @@ jobs:
         script: |
           import os
           import urllib.request
+          import ntpath
           version = "${{ env.LLVM_VERSION }}"
           platform = "${{ matrix.job.llvm_platform }}"
           print(f"version: {version}, platform: {platform}")
           url = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/LLVM-{version}-win{platform}.exe"
           print(f"Fetching LLVM from url: {url}")
-          (archive_name, headers) = urllib.request.urlretrieve(url)
+          (archive_path, headers) = urllib.request.urlretrieve(url)
+          archive_name = ntpath.basename(archive_path)
           dst_path = "C:/Program Files/LLVM"
-          print(f"File {archive_name} is downloaded: {os.path.exists(archive_name)}")
+          print(f"File {archive_name} is downloaded: {os.path.exists(archive_path)}")
           os.system(f"7z x -y -o{dst_path} {archive_name}")
           add_path(f"{dst_path}/bin")
           set_env("LLVM_PATH", f"{dst_path}/bin")
