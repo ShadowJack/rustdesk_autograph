@@ -85,9 +85,8 @@ jobs:
           import ntpath
           platform = "${{ matrix.job.platform }}"
           url = f"https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.win/x{platform}/sciter.dll"
-          (dll_path, _) = urllib.request.urlretrieve(url)
-          os.system(f'mkdir target/${{ matrix.job.target }}/release')
-          os.system(f'cp {dll_path} target/${{ matrix.job.target }}/release/sciter.dll')
+          (dll_path, _) = urllib.request.urlretrieve(url, "sciter.dll")
+          print(f'Sciter dll is downloaded to {dll_path}')
 
     - name: Build rustdesk
       run: python3 .\build.py --target=${{ matrix.job.target }}
