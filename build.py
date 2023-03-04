@@ -52,7 +52,7 @@ def main():
         os.system(f'mv target/{target}/release/rustdesk.exe target/{target}/release/RustDesk-{version}-{target}.exe')
         pa = os.environ.get('P')
         if pa:
-          os.system('signtool sign /a /v /p %s /debug /f .\\cert.pfx /t http://timestamp.digicert.com  target\\release\\rustdesk.exe'%pa)
+          os.system(f'signtool sign /a /v /p {pa} /debug /f .\\cert.pfx /t http://timestamp.digicert.com  target\\{target}\\release\\RustDesk-{version}-{target}.exe')
         else:
           print('Not signed')
     else:

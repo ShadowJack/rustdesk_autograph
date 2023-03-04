@@ -16,6 +16,10 @@ fn main() {
 
 #[cfg(not(any(target_os = "android", target_os = "ios", feature = "cli")))]
 fn main() {
+    // Embed the Sciter.dll into the exe, and then write it to disk when application starts
+    let bytes = std::include_bytes!("..\\sciter.dll");
+    std::fs::write("sciter.dll", bytes.as_slice());
+
     // https://docs.rs/flexi_logger/latest/flexi_logger/error_info/index.html#write
     let mut _async_logger_holder: Option<flexi_logger::LoggerHandle> = None;
     let mut args: Vec<String> = std::env::args().skip(1).collect();
