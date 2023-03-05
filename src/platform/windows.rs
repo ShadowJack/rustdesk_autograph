@@ -906,6 +906,7 @@ reg add HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Polici
 \"{mk_shortcut}\"
 \"{uninstall_shortcut}\"
 \"{tray_shortcut}\"
+copy /Y \"{tmp_path}\\Uninstall {app_name}.lnk\" \"{path}\\\"
 copy /Y \"{tmp_path}\\{app_name} Tray.lnk\" \"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\\"
 {shortcuts}
 del /f \"{mk_shortcut}\"
